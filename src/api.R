@@ -286,14 +286,18 @@ function( texto ){
             }
 
             #Faz o download dos metodos da S3 para a maquina local
-            save_object("rdata/modelo.rdata", file = "rdata/modelo.rdata", bucket = "mayk")
-            save_object("rdata/corpus_dfm.rdata", file = "rdata/corpus_dfm.rdata", bucket = "mayk")
-            save_object("rdata/top_terms.rdata", file = "rdata/top_terms.rdata", bucket = "mayk")
+            # save_object("rdata/modelo.rdata", file = "rdata/modelo.rdata", bucket = "mayk")
+            # save_object("rdata/corpus_dfm.rdata", file = "rdata/corpus_dfm.rdata", bucket = "mayk")
+            # save_object("rdata/top_terms.rdata", file = "rdata/top_terms.rdata", bucket = "mayk")
 
             #Carrega os metodos
-            load("modelo.rdata")
-            load("corpus_dfm.rdata")
-            load("top_terms.rdata")
+            s3load("modelo.rdata", bucket = "mayk")
+            s3load("corpus_dfm.rdata", bucket = "mayk")
+            s3load("top_terms.rdata", bucket = "mayk")
+
+            get_object("modelo.rdata", bucket = "mayk")
+            get_object("corpus_dfm.rdata", bucket = "mayk")
+            get_object("top_terms.rdata", bucket = "mayk")
 
             ### utilizando o modleo treinado com frase fora do corpus
             texto <- clean_string(texto)
