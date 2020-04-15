@@ -156,12 +156,11 @@ function(){
             
             #verificar upload
             #busca dados do S3 bucket mayk
-            #save_object("feature_matrix.txt", file = "feature_matrix.txt",bucket = "mayk")
-            #feature_matrix <- read.table(file = "feature_matrix.txt", header = T)
-            ##put_object(file = "feature_matrix.txt", object = "feature_matrix.txt", bucket ="mayk")
+            save_object("feature_matrix.txt", file = "feature_matrix.txt",bucket = "mayk")
+            feature_matrix <- read.table(file = "feature_matrix.txt", header = T)
             #Fim busca dados
             
-            feature_matrix <-  read.table("https://raw.githubusercontent.com/raphaelmcobe/r-text-analysis/master/feature_matrix.txt", header = T) 
+            #feature_matrix <-  read.table("https://raw.githubusercontent.com/raphaelmcobe/r-text-analysis/master/feature_matrix.txt", header = T) 
 
 
             feature_matrix <- cbind(feature_matrix, filtered_data$score)
@@ -192,9 +191,15 @@ function(){
 
             print(head(cbind(test_Y, round(prediction$net.result, 4))))
 
-            save(nn, file="rdata/modelo.rdata")
-            save(corpus_dfm, file="rdata/corpus_dfm.rdata")
-            save(top_terms, file="rdata/top_terms.rdata")
+            #Salva os metodos na maquina local
+            save(nn, file="modelo.rdata")
+            save(corpus_dfm, file="corpus_dfm.rdata")
+            save(top_terms, file="top_terms.rdata")
+
+            #salva os metodos na AWS s3
+            put_object(file = "rdata/modelo.rdata", object = "rdata/modelo.rdata", bucket = "mayk")
+            put_object(file = "rdata/corpus_dfm.rdata", object = "rdata/corpus_dfm.rdata", bucket = "mayk")
+            put_object(file = "rdata/top_terms.rdata", object = "rdata/top_terms.rdata", bucket = "mayk")
 
 
             paste("treinamento finalizado com sucesso")
@@ -286,9 +291,15 @@ function( texto ){
                 results
             }
 
-            load("rdata/modelo.rdata")
-            load("rdata/corpus_dfm.rdata")
-            load("rdata/top_terms.rdata")
+            #Faz o download dos metodos da S3 para a maquina local
+            save_object("rdata/modelo.rdata", file = "rdata/modelo.rdata", bucket = "mayk")
+            save_object("rdata/corpus_dfm.rdata", file = "rdata/corpus_dfm.rdata", bucket = "mayk")
+            save_object("rdata/top_terms.rdata", file = "rdata/top_terms.rdata", bucket = "mayk")
+
+            #Carrega os metodos
+            load("modelo.rdata")
+            load("corpus_dfm.rdata")
+            load("top_terms.rdata")
 
             ### utilizando o modleo treinado com frase fora do corpus
             texto <- clean_string(texto)
@@ -301,3 +312,8 @@ function( texto ){
 
             compute(nn, texto_features)$net.result
 }
+
+ 
+            
+
+            
