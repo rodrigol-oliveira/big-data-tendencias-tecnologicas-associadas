@@ -1,17 +1,10 @@
-#install libs
-install.packages('curl') 
-install.packages('httr') 
-install.packages('xml2') 
-install.packages('digest') 
-install.packages('base64enc') 
-install.packages("aws.s3", repos = c("cloudyr" = "http://cloudyr.github.io/drat"))
 
 # libs 
 library(stringr)
 library(quanteda)
 library(dplyr)
 library(neuralnet)
-library("aws.s3")
+library(aws.s3)
 
 Sys.setenv("AWS_ACCESS_KEY_ID" = "AKIAXSWHGJTYRXFWKE6F", "AWS_SECRET_ACCESS_KEY" = "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", "AWS_DEFAULT_REGION" = "us-east-2")
 
@@ -192,9 +185,15 @@ function(){
 
             print(head(cbind(test_Y, round(prediction$net.result, 4))))
 
-            save(nn, file="rdata/modelo.rdata")
-            save(corpus_dfm, file="rdata/corpus_dfm.rdata")
-            save(top_terms, file="rdata/top_terms.rdata")
+            #Salva os metodos na maquina local
+            save(nn, file="modelo.rdata")
+            save(corpus_dfm, file="corpus_dfm.rdata")
+            save(top_terms, file="top_terms.rdata")
+
+            #salva os metodos na AWS s3
+            put_object(file = "rdata/modelo.rdata", object = "rdata/modelo.rdata", bucket = "mayk")
+            put_object(file = "rdata/corpus_dfm.rdata", object = "rdata/corpus_dfm.rdata", bucket = "mayk")
+            put_object(file = "rdata/top_terms.rdata", object = "rdata/top_terms.rdata", bucket = "mayk")
 
 
             paste("treinamento finalizado com sucesso")
@@ -286,9 +285,15 @@ function( texto ){
                 results
             }
 
-            load("rdata/modelo.rdata")
-            load("rdata/corpus_dfm.rdata")
-            load("rdata/top_terms.rdata")
+            #Faz o download dos metodos da S3 para a maquina local
+            save_object("rdata/modelo.rdata", file = "rdata/modelo.rdata", bucket = "mayk")
+            save_object("rdata/corpus_dfm.rdata", file = "rdata/corpus_dfm.rdata", bucket = "mayk")
+            save_object("rdata/top_terms.rdata", file = "rdata/top_terms.rdata", bucket = "mayk")
+
+            #Carrega os metodos
+            load("modelo.rdata")
+            load("corpus_dfm.rdata")
+            load("top_terms.rdata")
 
             ### utilizando o modleo treinado com frase fora do corpus
             texto <- clean_string(texto)
@@ -299,5 +304,14 @@ function( texto ){
 
             dim(texto_features)
 
-            compute(nn, texto_features)$net.result
+            resultado = compute(nn, texto_features)$net.result
+
+            print(resultado)    
+
+            if ( resultado  > 0.5){
+                "Frase positiva"
+            }else{
+                "Frase negativa"
+            }
+
 }
