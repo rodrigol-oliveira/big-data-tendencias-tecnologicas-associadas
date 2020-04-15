@@ -191,9 +191,9 @@ function(){
             save(top_terms, file="top_terms.rdata")
 
             #salva os metodos na AWS s3
-            put_object(file = "rdata/modelo.rdata", object = "rdata/modelo.rdata", bucket = "mayk")
-            put_object(file = "rdata/corpus_dfm.rdata", object = "rdata/corpus_dfm.rdata", bucket = "mayk")
-            put_object(file = "rdata/top_terms.rdata", object = "rdata/top_terms.rdata", bucket = "mayk")
+            put_object(file = "modelo.rdata", object = "modelo.rdata", bucket = "mayk")
+            put_object(file = "corpus_dfm.rdata", object = "corpus_dfm.rdata", bucket = "mayk")
+            put_object(file = "top_terms.rdata", object = "top_terms.rdata", bucket = "mayk")
 
 
             paste("treinamento finalizado com sucesso")
@@ -294,10 +294,6 @@ function( texto ){
             s3load("modelo.rdata", bucket = "mayk")
             s3load("corpus_dfm.rdata", bucket = "mayk")
             s3load("top_terms.rdata", bucket = "mayk")
-
-            get_object("modelo.rdata", bucket = "mayk")
-            get_object("corpus_dfm.rdata", bucket = "mayk")
-            get_object("top_terms.rdata", bucket = "mayk")
 
             ### utilizando o modleo treinado com frase fora do corpus
             texto <- clean_string(texto)
