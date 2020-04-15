@@ -1,8 +1,19 @@
+#install libs
+install.packages('curl') 
+install.packages('httr') 
+install.packages('xml2') 
+install.packages('digest') 
+install.packages('base64enc') 
+install.packages("aws.s3", repos = c("cloudyr" = "http://cloudyr.github.io/drat"))
+
 # libs 
 library(stringr)
 library(quanteda)
 library(dplyr)
 library(neuralnet)
+library("aws.s3")
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "AKIAXSWHGJTYRXFWKE6F", "AWS_SECRET_ACCESS_KEY" = "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", "AWS_DEFAULT_REGION" = "us-east-2")
 
 
 #* Return 
@@ -92,8 +103,13 @@ function(){
             }
 
             # Leitura e processamento dos dados
-
-            review_data <- read.csv(file = "./dataset/b2w-10k.csv")
+            
+            #busca dados do S3 bucket mayk
+            save_object("dataset.csv", file = "dataset.csv",bucket = "mayk")
+            review_data <- read.csv(file = "dataset.csv")
+            #Fim busca dados
+            
+            #review_data <- read.csv(file = "./dataset/b2w-10k.csv") codigo caso nao for AWS
             head(review_data)
 
             # separando os campos contendo o texto do review e a coluna com o dado sobre recomendacao
@@ -137,6 +153,14 @@ function(){
             #feature_matrix <- vectorize_sequences(filtered_data$review_text, corpus_dfm, top_terms)
 
             ## usar ja processado 
+            
+            #verificar upload
+            #busca dados do S3 bucket mayk
+            #save_object("feature_matrix.txt", file = "feature_matrix.txt",bucket = "mayk")
+            #feature_matrix <- read.table(file = "feature_matrix.txt", header = T)
+            ##put_object(file = "feature_matrix.txt", object = "feature_matrix.txt", bucket ="mayk")
+            #Fim busca dados
+            
             feature_matrix <-  read.table("https://raw.githubusercontent.com/raphaelmcobe/r-text-analysis/master/feature_matrix.txt", header = T) 
 
 
